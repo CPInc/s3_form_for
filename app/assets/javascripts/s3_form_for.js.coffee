@@ -68,22 +68,30 @@ $.fn.S3Uploader = (options) ->
 
       loadImage.parseMetaData file, (img) ->
         ornt = if img.exif? then img.exif.get("Orientation") else 1
-        image_contaner = $($uploadForm).find(".s3_image")
-        attr_image_max_height = image_contaner.data('image-max-height')
+        image_container = $($uploadForm).find(".s3_image")
+        attr_image_max_height = image_container.data('image-max-height')
+        attr_image_max_width = image_container.data('image-max-width')
         max_height =  if attr_image_max_height == undefined
                         48
                       else
                         attr_image_max_height
+        max_width = if attr_image_max_width == undefined
+                        48
+                      else
+                        attr_image_max_width
 
         # Set thumbnail
         loadImage file, ((img) ->
             imgElem = $(img)
-            image_contaner.empty()
-            image_contaner.append imgElem
+            image_container.empty()
+            image_container.append imgElem
           ),
           maxHeight: max_height
+          maxWidth: max_width
           orientation: ornt
           canvas: false
+
+
     else
       # Fallback; just use a placeholder
       image = $('<img/>', {src: assetPath('media/mrx-placeholder-120x90.png')})

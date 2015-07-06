@@ -1,6 +1,6 @@
 module ActionView::Helpers
   class FormBuilder
-    def s3_preogress_bar
+    def s3_progress_bar
       c = @template.content_tag('div')
       c << @template.content_tag('div', class: 'upload_uploading hidden') do
         @template.content_tag('div', class: 'upload-header') do
@@ -29,31 +29,8 @@ module ActionView::Helpers
     end
 
     def s3_file(method, options = {}, html_options = {})
-
       options = options.with_indifferent_access
-      browser_name = Browser.new(:ua => options[:http_user_agent], :accept_language => "en-us").name
-
-      all_formats = {}
-      all_formats.merge!(options[:photo_formats]) if options[:photo_formats].present?
-      all_formats.merge!(options[:video_formats]) if options[:video_formats].present?
-      all_formats.merge!(options[:report_formats]) if options[:report_formats].present?
-      all_formats.merge!(options[:dicom_formats]) if options[:dicom_formats].present?
-
-      available_mime = all_formats.values
-
-      accept_mime = case browser_name
-                      when 'Chrome'
-                        ''
-                      when 'Firefox'
-                        all_formats = []
-                        all_formats << 'image/*'  if options[:photo_formats].present?
-                        all_formats << 'video/*' if options[:video_formats].present?
-                        all_formats << 'application/*' if options[:report_formats].present? || options[:dicom_formats].present?
-                        all_formats.join(', ')
-                      else
-                        available_mime.join(', ')
-                    end
-
+      available_mime, accept_mime = accepted_formats(options)
 
       k = @template.content_tag('div', class: 'row') do
         @template.content_tag('div', class: 'col-md-12') do
@@ -150,6 +127,55 @@ module ActionView::Helpers
         end
       end
       k
+    end
+
+    def logo_s3_file(method, options = {}, html_options = {})
+      options = options.with_indifferent_access
+      available_mime, accept_mime = accepted_formats(options)
+
+      k = @template.content_tag('a', class: 'new-protocol-logo empty', href: 'javascript:void(0);') do
+        e = @template.hidden_field_tag('upload_s3_path', nil, id: 'upload_s3_path')
+        e << @template.file_field_tag('file', class: 'file-field', id: 'file', accept: accept_mime, data: {available_mime: available_mime.join(' ')})
+        e << @template.content_tag('div', id: 'upload_thumbnail', class: 's3_image', data: { "image-max-height" => 64, "image-max-width" => 64 }) do
+          if options[:thumb_url]
+            @template.image_tag(options[:thumb_url], class: 'img-responsive')
+          else
+            @template.content_tag('span') { "Upload Logo" }
+          end
+        end
+        e
+      end
+      k
+    end
+
+
+    private
+
+    def accepted_formats(options)
+      browser_name = Browser.new(:ua => options[:http_user_agent], :accept_language => "en-us").name
+
+      all_formats = {}
+      all_formats.merge!(options[:photo_formats]) if options[:photo_formats].present?
+      all_formats.merge!(options[:video_formats]) if options[:video_formats].present?
+      all_formats.merge!(options[:report_formats]) if options[:report_formats].present?
+      all_formats.merge!(options[:dicom_formats]) if options[:dicom_formats].present?
+
+      available_mime = all_formats.values
+
+      accept_mime = case browser_name
+                      when 'Chrome'
+                        ''
+                      when 'Firefox'
+                        all_formats = []
+                        all_formats << 'image/*'  if options[:photo_formats].present?
+                        all_formats << 'video/*' if options[:video_formats].present?
+                        all_formats << 'application/*' if options[:report_formats].present? || options[:dicom_formats].present?
+                        all_formats.join(', ')
+                      else
+                        available_mime.join(', ')
+                    end
+
+      return [available_mime, accept_mime]
     end
   end
 end
