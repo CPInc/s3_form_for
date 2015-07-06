@@ -135,7 +135,8 @@ module ActionView::Helpers
 
       k = @template.content_tag('a', class: 'new-protocol-logo empty', href: 'javascript:void(0);') do
         e = @template.hidden_field_tag('upload_s3_path', nil, id: 'upload_s3_path')
-        e << @template.file_field_tag('file', class: 'file-field', id: 'file', accept: accept_mime, data: {available_mime: available_mime.join(' ')})
+        e << @template.file_field_tag('file', class: 'file-field', id: 'file', accept: accept_mime, data: { available_mime: available_mime.join(' ') })
+
         e << @template.content_tag('div', id: 'upload_thumbnail', class: 's3_image', data: { "image-max-height" => 64, "image-max-width" => 64 }) do
           if options[:thumb_url]
             @template.image_tag(options[:thumb_url], class: 'img-responsive')
@@ -143,6 +144,7 @@ module ActionView::Helpers
             @template.content_tag('span') { "Upload Logo" }
           end
         end
+
         e
       end
       k
@@ -152,7 +154,7 @@ module ActionView::Helpers
     private
 
     def accepted_formats(options)
-      browser_name = Browser.new(:ua => options[:http_user_agent], :accept_language => "en-us").name
+      browser_name = Browser.new(ua: options[:http_user_agent], accept_language: 'en-us').name
 
       all_formats = {}
       all_formats.merge!(options[:photo_formats]) if options[:photo_formats].present?
