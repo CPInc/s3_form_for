@@ -35,9 +35,7 @@ module ActionView::Helpers
       k = @template.content_tag('div', class: 'row') do
         @template.content_tag('div', class: 'col-md-12') do
           b = @template.content_tag('div', id: "upload_thumbnail") do
-            @template.content_tag('span', href: 'javascript:void(0);', class: 'empty-avatar') do
-              ""
-            end
+            @template.content_tag('span', '', href: 'javascript:void(0);', class: 'empty-avatar')
           end
 
           b << @template.content_tag('div', class: 'upload-info') do
@@ -51,7 +49,7 @@ module ActionView::Helpers
                   a = @template.content_tag('a', href: 'javascript:void(0);', class: 'btn btn-file btn-default') do
                     span = @template.content_tag('span', class: 'overflow') do
                       e = @template.hidden_field_tag("upload_s3_path", nil, id: 'upload_s3_path')
-                      e << @template.file_field_tag('file', class: "file-field", id: "file", accept: accept_mime, data: {available_mime: available_mime.join(' ')})
+                      e << @template.file_field_tag('file', class: "file-field", id: "file", accept: accept_mime, data: { available_mime: available_mime.join(' ') })
                       e
                     end
 
@@ -162,7 +160,7 @@ module ActionView::Helpers
       all_formats.merge!(options[:report_formats]) if options[:report_formats].present?
       all_formats.merge!(options[:dicom_formats]) if options[:dicom_formats].present?
 
-      available_mime = all_formats.values
+      available_mime = all_formats.values.flatten
 
       accept_mime = case browser_name
                       when 'Chrome'
