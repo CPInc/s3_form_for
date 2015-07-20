@@ -42,7 +42,7 @@ module ActionView::Helpers
     private
 
     def renderer
-      @renderer ||=  ActionView::Base.new Rails.roos.join('app/views')
+      @renderer ||=  ActionView::Base.new Rails.root.join('app/views')
     end
 
     def accepted_formats(options)
