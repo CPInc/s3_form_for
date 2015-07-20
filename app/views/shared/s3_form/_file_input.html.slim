@@ -10,7 +10,7 @@
               a.btn.btn-file.btn-default href='#'
                 span.overflow
                   = hidden_field_tag 'upload_s3_path', nil, id: 'upload_s3_path'
-                  = file_field_tag 'file', class: 'file-field', id: 'file', accept: accept_mime, data: { available_mime: available_mime.join(' ') }
+                  = file_field_tag 'file', class: 'file-field', id: 'file', accept: (local_assigns[:accept_mime] || ' '), data: { available_mime: available_mime.join(' ') }
                 span.btn-file-text Choose
               span#file_name_for_upload.file-name No file selected
 
@@ -20,5 +20,6 @@
               - next unless options["#{ a }_formats"]
               p.h4
                 span = "#{a.upcase} - #{options["#{a}_formats"].keys.join(', ').upcase}"
-                = link_to '#', { class: "btn btn-default btn-xs link_for_s3_file_upload" }.merge(options["#{a}_link"][:link_options]), html_options do
-                  = options["#{ a }_link"][:link_options][:link_name]
+                - if options["#{ a }_link"].present?
+                  = link_to '#', { class: "btn btn-default btn-xs link_for_s3_file_upload" }.merge(options["#{ a }_link"][:link_options]), html_options do
+                    = options["#{ a }_link"][:link_options][:link_name]
