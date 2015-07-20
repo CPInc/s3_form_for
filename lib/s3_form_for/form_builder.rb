@@ -1,5 +1,9 @@
 module ActionView::Helpers
   class FormBuilder
+
+    view_paths = Rails::Application::Configuration.new(Rails.root).paths["app/views"]
+    av_helper = ActionView::Base.new view_paths
+
     def s3_progress_bar
       @template.render '/shared/s3_form/progress_bar'
     end
@@ -8,7 +12,8 @@ module ActionView::Helpers
       options = options.with_indifferent_access
       available_mime, accept_mime = accepted_formats(options)
 
-      k = render '/shared/s3_form/file_input', {
+
+      k = renderer.render '/shared/s3_form/file_input', locals: {
                 options: options,
                 available_mime: available_mime,
                 accept_mime: accept_mime,
@@ -25,7 +30,7 @@ module ActionView::Helpers
       options = options.with_indifferent_access
       available_mime, accept_mime = accepted_formats(options)
 
-      render '/shared/s3_form/logo_file', {
+      renderer.render '/shared/s3_form/logo_file', locals: {
           options: options,
           available_mime: available_mime,
           accept_mime: accept_mime,
@@ -35,6 +40,10 @@ module ActionView::Helpers
 
 
     private
+
+    def renderer
+      @renderer ||=  ActionView::Base.new Rails.roos.join('app/views')
+    end
 
     def accepted_formats(options)
       browser_name = Browser.new(ua: options[:http_user_agent], accept_language: 'en-us').name
