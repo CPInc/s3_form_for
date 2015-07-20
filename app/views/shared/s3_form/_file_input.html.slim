@@ -10,7 +10,7 @@
               a.btn.btn-file.btn-default href='#'
                 span.overflow
                   = hidden_field_tag 'upload_s3_path', nil, id: 'upload_s3_path'
-                  = file_field_tag 'file', class: 'file-field', id: 'file', accept: (local_assigns[:accept_mime] || ' '), data: { available_mime: available_mime.join(' ') }
+                  = file_field_tag 'file', class: 'file-field', id: 'file', accept: (local_assigns[:accept_mime] || ' '), data: { available_mime: (local_assigns[:available_mime] || [' ']).join(' ') }
                 span.btn-file-text Choose
               span#file_name_for_upload.file-name No file selected
 
