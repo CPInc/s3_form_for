@@ -8,7 +8,7 @@ module ActionView::Helpers
       options = options.with_indifferent_access
       available_mime, accept_mime = accepted_formats(options)
 
-      k = @template.render '/shared/s3_form/file_input', locals: {
+      k = @template.render '/shared/s3_form/file_input', {
                 options: options,
                 available_mime: available_mime,
                 accept_mime: accept_mime,
@@ -25,7 +25,7 @@ module ActionView::Helpers
       options = options.with_indifferent_access
       available_mime, accept_mime = accepted_formats(options)
 
-      @template.render '/shared/s3_form/logo_file', locals: {
+      @template.render '/shared/s3_form/logo_file', {
           options: options,
           available_mime: available_mime,
           accept_mime: accept_mime,
