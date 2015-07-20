@@ -105,9 +105,6 @@ $.fn.S3Uploader = (options) ->
     else
       false
 
-
-
-
   setUploadForm = ->
     $uploadForm.fileupload
       url: $uploadForm.data('s3-url')
@@ -250,8 +247,12 @@ $.fn.S3Uploader = (options) ->
         $(forms_for_submit).submit()
 
       if settings.allow_send_form_without_file && file_name_for_upload_text == 'No file selected'
-        $($uploadForm).off 'submit'
-        $($uploadForm).submit()
+        $uploadForm.off 'submit'
+        if $uploadForm.attr('data-ajax-submit')?
+          $uploadForm.trigger 'ready-to-submit'
+          false
+        else
+          $uploadForm.submit()
       else
         false
 
@@ -278,8 +279,11 @@ $.fn.S3Uploader = (options) ->
       $(selectors.submit).removeClass("disabled").prop "disabled", false
       $("#upload_skip_link").removeClass "hidden"
       $uploadForm.find("#upload_s3_path").val(content.filepath)
-      $($uploadForm).off 'submit'
-      $($uploadForm).submit()#rigger('submit')
+      $uploadForm.off 'submit'
+      if $uploadForm.attr('data-ajax-submit')?
+        $uploadForm.trigger 'ready-to-submit'
+      else
+        $uploadForm.submit()
 
   build_content_object = ($uploadForm, file, result) ->
     content = {}

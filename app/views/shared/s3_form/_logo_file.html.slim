@@ -1,0 +1,8 @@
+a.new-protocol-logo.empty href='javascript:void(0);'
+  = hidden_field_tag 'upload_s3_path', nil, id: 'upload_s3_path'
+  = file_field_tag 'file', class: 'file-field', id: 'file', accept: accept_mime, data: { available_mime: available_mime.join(' ') })
+  #upload_thumbnail.s3_image data-image-max-height=64 data-image-max-width=64
+    - if options[:thumb_url]
+      = image_tag options[:thumb_url], class: 'img-responsive'
+    - else
+      span Upload Logo

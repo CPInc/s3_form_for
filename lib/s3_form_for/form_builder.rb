@@ -1,128 +1,22 @@
 module ActionView::Helpers
   class FormBuilder
     def s3_progress_bar
-      c = @template.content_tag('div')
-      c << @template.content_tag('div', class: 'upload_uploading hidden') do
-        @template.content_tag('div', class: 'upload-header') do
-          'Your file is uploading. Do not close your browser.'
-        end
-
-        @template.content_tag('div', class: 'upload-main') do
-          @template.content_tag('div', class: 'progress progress-striped active') do
-            @template.content_tag('div', nil, class: 'progress-bar bar')
-          end
-        end
-      end
-
-      c << @template.content_tag('div', class: 'upload_succeeded hidden') do
-        @template.content_tag('div', class: 'upload-main') do
-          @template.content_tag('h4', 'Upload complete')
-        end
-      end
-
-      c << @template.content_tag('div', class: 'upload_failed hidden') do
-        @template.content_tag('div', class: 'upload-main') do
-          @template.content_tag('h4', "We couldn't upload your media file. Please ensure it is a valid image or video file.")
-        end
-      end
-      c
+      @template.render '/shared/s3_form/progress_bar'
     end
 
     def s3_file(method, options = {}, html_options = {})
       options = options.with_indifferent_access
       available_mime, accept_mime = accepted_formats(options)
 
-      k = @template.content_tag('div', class: 'row') do
-        @template.content_tag('div', class: 'col-md-12') do
-          b = @template.content_tag('div', id: "upload_thumbnail") do
-            @template.content_tag('span', '', href: 'javascript:void(0);', class: 'empty-avatar')
-          end
-
-          b << @template.content_tag('div', class: 'upload-info') do
-            @template.content_tag('div', class: 'upload-before') do
-              c = @template.content_tag('div', class: 'upload-info-select') do
-                z = @template.content_tag('p', class: 'h3') do
-                  'Please select file to upload:'
-                end
-
-                z << @template.content_tag('p') do
-                  a = @template.content_tag('a', href: 'javascript:void(0);', class: 'btn btn-file btn-default') do
-                    span = @template.content_tag('span', class: 'overflow') do
-                      e = @template.hidden_field_tag("upload_s3_path", nil, id: 'upload_s3_path')
-                      e << @template.file_field_tag('file', class: "file-field", id: "file", accept: accept_mime, data: { available_mime: available_mime.join(' ') })
-                      e
-                    end
-
-                    span << @template.content_tag('span', class: 'btn-file-text') do
-                      'Choose'
-                    end
-                    span
-                  end
-
-                  a << @template.content_tag('span', class: 'file-name', id: 'file_name_for_upload') do
-                    'No file selected'
-                  end
-                  a
-                end
-                z
-              end
-
-              c << @template.content_tag('div', class: 'upload-info-formats') do
-                u = @template.content_tag('p', class: 'h3') do
-                  'formats are:'
-                end
-                [:photo, :video, :report, :dicom].map do |a|
-                  if options["#{a}_formats"]
-                    u << @template.content_tag('p', class: 'h4') do
-                      g = @template.content_tag('span') do
-                        "#{a.upcase} - #{options["#{a}_formats"].keys.join(', ').upcase}"
-                      end
-                      if options["#{a}_link"].present?
-
-                        link_options = { class: "btn btn-default btn-xs link_for_s3_file_upload" }.merge(options["#{a}_link"][:link_options])
-                        link_name = options["#{a}_link"][:link_options][:link_name]
-                        link_options.delete('link_name')
-                        g << @template.content_tag('a', link_options) do
-                          link_name
-                        end
-                      end
-                      g
-                    end
-                  end
-                end
-                u
-              end
-              c
-            end
-          end
-          b
-        end
-      end
+      k = @template.render '/shared/s3_form/file_input', locals: {
+                options: options,
+                available_mime: available_mime,
+                accept_mime: accept_mime,
+                html_options: html_options
+      }
 
       unless options[:without_progress_bar]
-        k << @template.content_tag('div', class: 'upload_uploading hidden') do
-          @template.content_tag('div', class: 'upload-header') do
-            'Your file is uploading. Do not close your browser.'
-          end
-
-          @template.content_tag('div', class: 'upload-main') do
-            @template.content_tag('div', class: 'progress progress-striped active') do
-              @template.content_tag('div', nil, class: 'progress-bar bar')
-            end
-          end
-        end
-
-        k << @template.content_tag('div', class: 'upload_succeeded hidden') do
-          @template.content_tag('div', class: 'upload-main') do
-            @template.content_tag('h4', 'Upload complete')
-          end
-        end
-
-        k << @template.content_tag('div', class: 'upload_failed hidden') do
-          @template.content_tag('div', class: 'upload-main') do
-            @template.content_tag('h4', "We couldn't upload your media file. Please ensure it is a valid image or video file.")
-          end
-        end
+        k << @template.render('/shared/s3_form/progress_bar')
       end
       k
     end
@@ -131,21 +25,12 @@ module ActionView::Helpers
       options = options.with_indifferent_access
       available_mime, accept_mime = accepted_formats(options)
 
-      k = @template.content_tag('a', class: 'new-protocol-logo empty', href: 'javascript:void(0);') do
-        e = @template.hidden_field_tag('upload_s3_path', nil, id: 'upload_s3_path')
-        e << @template.file_field_tag('file', class: 'file-field', id: 'file', accept: accept_mime, data: { available_mime: available_mime.join(' ') })
-
-        e << @template.content_tag('div', id: 'upload_thumbnail', class: 's3_image', data: { "image-max-height" => 64, "image-max-width" => 64 }) do
-          if options[:thumb_url]
-            @template.image_tag(options[:thumb_url], class: 'img-responsive')
-          else
-            @template.content_tag('span') { "Upload Logo" }
-          end
-        end
-
-        e
-      end
-      k
+      @template.render '/shared/s3_form/logo_file', locals: {
+          options: options,
+          available_mime: available_mime,
+          accept_mime: accept_mime,
+          html_options: html_options
+      }
     end
 
 

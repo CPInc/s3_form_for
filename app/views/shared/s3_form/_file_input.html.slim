@@ -1,0 +1,24 @@
+.row
+  .col-md-12
+    .upload_thumbnail
+      span.empty-avatar
+      .upload-info
+        .upload-before
+          .upload-info-select
+            p.h3 Please select file to upload:
+            p
+              a.btn.btn-file.btn-default href='#'
+                span.overflow
+                  = hidden_field_tag 'upload_s3_path', nil, id: 'upload_s3_path'
+                  = file_field_tag 'file', class: 'file-field', id: 'file', accept: accept_mime, data: { available_mime: available_mime.join(' ') }
+                span.btn-file-text Choose
+              span#file_name_for_upload.file-name No file selected
+
+          .upload-info-formats
+            p.h3 formats are:
+            - [:photo, :video, :report, :dicom].map do |a|
+              - next unless options["#{ a }_formats"]
+              p.h4
+                span = "#{a.upcase} - #{options["#{a}_formats"].keys.join(', ').upcase}"
+                = link_to '#', { class: "btn btn-default btn-xs link_for_s3_file_upload" }.merge(options["#{a}_link"][:link_options]), html_options do
+                  = options["#{ a }_link"][:link_options][:link_name]
